@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>身高估算｜膝長 (Knee height) 與 手臂半展長 (Demispan) 線上計算器</title>
+<meta name="description" content="依據膝長與手臂半展長估算成人身高的線上計算器。公式出處：MUST 解說手冊、StatPearls 等。">
+<style>
+:root{
+  --bg:#f7f8fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --brand:#2563eb;
+  --brand-2:#0ea5e9;
+  --ok:#16a34a;
+  --warn:#b45309;
+  --danger:#dc2626;
+  --ring: 0 0 0 3px rgba(37,99,235,.15);
+  --shadow: 0 8px 24px rgba(0,0,0,.08);
+  --radius: 14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+  color:var(--text);
+  background:linear-gradient(180deg,#f8fbff 0,#f5f7fb 100%);
+}
+.container{
+  max-width: 980px;
+  padding: 20px;
+  margin: auto;
+}
+.header{
+  text-align:center;
+  margin: 10px 0 20px;
+}
+h1{
+  font-size: clamp(22px, 4vw, 30px);
+  margin: 0 0 8px;
+}
+.sub{
+  color:var(--muted);
+  font-size: 14px;
+}
+.grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+@media (min-width: 900px){
+  .grid{ grid-template-columns: 1fr 1fr; }
+}
+.card{
+  background:var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding:18px;
+  border:1px solid #eef2f7;
+}
+.card h2{
+  font-size: 18px;
+  margin: 0 0 12px;
+  display:flex; align-items:center; gap:10px;
+}
+.badge{
+  background: #e8f0ff;
+  color: #1e40af;
+  font-weight:600;
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:999px;
+}
+.row{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px; }
+.row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+label{ font-size:13px; color:var(--muted); display:block; margin-bottom:6px;}
+input, select{
+  width:100%; padding:12px 12px; border-radius:10px; border:1px solid #dfe6ef; background:#fff; color:var(--text);
+  outline: none; transition: box-shadow .15s, border-color .15s, transform .02s;
+  font-size:16px;
+}
+input:focus, select:focus{ border-color:var(--brand); box-shadow: var(--ring); }
+small.help{ color:var(--muted); display:block; margin-top:4px; font-size:12px; }
+.output{
+  background: #0b1220; color: #e5edff; border-radius: 12px; padding:14px; 
+  display:flex; align-items:center; justify-content: space-between; gap:14px;
+}
+.out-val{ font-size: clamp(22px, 4vw, 30px); font-weight:800; letter-spacing:.5px; }
+.copy-btn{
+  border:none; border-radius:10px; padding:10px 12px; font-weight:700; cursor:pointer; 
+  background: linear-gradient(135deg, var(--brand), var(--brand-2)); color:#fff;
+}
+.copy-btn:active{ transform: translateY(1px); }
+.formula{
+  background:#f6f8ff; border:1px dashed #c7d2fe; border-radius:12px; padding:10px 12px; font-size:13px; color:#1e3a8a;
+}
+.footer{
+  margin-top:22px; font-size:12px; color:var(--muted);
+}
+.kicker{
+  display:flex; gap:10px; align-items:center; justify-content:center; margin-top:10px;
+}
+.tag{ background:#ecfeff; color:#0c4a6e; border:1px solid #cffafe; padding:3px 8px; border-radius:999px; font-size:12px;}
+hr.sep{ border:none; border-top:1px solid #e7eef7; margin: 14px 0; }
+.warn{ color:var(--warn); font-size:12px; margin:6px 0 0; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>身高估算計算器</h1>
+      <div class="sub">對無法站立量身高的個案，使用 <strong>膝長 (Knee height)</strong> 或 <strong>手臂半展長 (Demispan)</strong> 進行估算</div>
+      <div class="kicker">
+        <span class="tag">單位：公分 (cm)</span>
+        <span class="tag">即時計算</span>
+        <span class="tag">離線可用</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="card" id="knee-card">
+        <h2><span class="badge">方式 A</span> 膝長 Knee height 估算</h2>
+
+        <div class="row3">
+          <div>
+            <label for="sex-knee">生理性別</label>
+            <select id="sex-knee" aria-label="生理性別">
+              <option value="M">男性</option>
+              <option value="F">女性</option>
+            </select>
+          </div>
+          <div>
+            <label for="age-knee">年齡 (歲)</label>
+            <input id="age-knee" type="number" inputmode="decimal" min="18" max="120" step="1" placeholder="例如 70">
+            <small class="help">建議輸入 18–120 歲的成人</small>
+          </div>
+          <div>
+            <label for="kh">膝長 KH (cm)</label>
+            <input id="kh" type="number" inputmode="decimal" min="20" max="80" step="0.1" placeholder="例如 50.2">
+            <small class="help">坐姿，腳踝成 90°，從腳跟到大腿下緣的垂直距離</small>
+          </div>
+        </div>
+
+        <div class="formula">公式：
+          <div>男性：Ht = 64.19 − (0.04 × 年齡) + (2.02 × 膝長)</div>
+          <div>女性：Ht = 84.88 − (0.24 × 年齡) + (1.83 × 膝長)</div>
+        </div>
+
+        <hr class="sep">
+
+        <div class="output">
+          <div>
+            <div style="font-size:12px; opacity:.8;">估算身高</div>
+            <div class="out-val" id="out-knee">—</div>
+          </div>
+          <button class="copy-btn" data-target="out-knee">複製結果</button>
+        </div>
+        <div id="warn-knee" class="warn" role="status" aria-live="polite"></div>
+      </div>
+
+      <div class="card" id="demi-card">
+        <h2><span class="badge">方式 B</span> 手臂半展長 Demispan 估算</h2>
+
+        <div class="row">
+          <div>
+            <label for="sex-demi">生理性別</label>
+            <select id="sex-demi" aria-label="生理性別">
+              <option value="M">男性</option>
+              <option value="F">女性</option>
+            </select>
+          </div>
+          <div>
+            <label for="demispan">手臂半展長 (cm)</label>
+            <input id="demispan" type="number" inputmode="decimal" min="30" max="110" step="0.1" placeholder="例如 80.5">
+            <small class="help">從胸骨柄切跡到中指尖之距離</small>
+          </div>
+        </div>
+
+        <div class="formula">公式：
+          <div>男性：Ht = (1.40 × Demispan) + 57.8</div>
+          <div>女性：Ht = (1.35 × Demispan) + 60.1</div>
+        </div>
+
+        <hr class="sep">
+
+        <div class="output">
+          <div>
+            <div style="font-size:12px; opacity:.8;">估算身高</div>
+            <div class="out-val" id="out-demi">—</div>
+          </div>
+          <button class="copy-btn" data-target="out-demi">複製結果</button>
+        </div>
+        <div id="warn-demi" class="warn" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>量測與提醒</h2>
+      <ul style="margin:0 0 0 18px; line-height:1.6;">
+        <li>所有輸入皆以 <strong>公分 (cm)</strong> 計。</li>
+        <li>結果預設四捨五入至 <strong>小數點一位</strong>。點擊「複製結果」可快速貼上至病歷或表單。</li>
+        <li>本工具僅供成人一般估算；脊柱彎曲、四肢畸形或截肢者，可能低估或高估。</li>
+        <li>若兩種方法皆可量得，建議同時估算並參考臨床判斷。</li>
+      </ul>
+      <div class="footer">
+        公式參考：MUST Explanatory Booklet；StatPearls；Adv Skin Wound Care 等資料彙整（見出處圖卡）。
+      </div>
+    </section>
+  </div>
+
+<script>
+function fmt(v){
+  if(!isFinite(v)) return "—";
+  return (Math.round(v*10)/10).toFixed(1) + " cm";
+}
+function setOut(id, value){ document.getElementById(id).textContent = fmt(value); }
+function warn(el, msg){ el.textContent = msg || ""; }
+
+function calcKnee(){
+  const sex = document.getElementById('sex-knee').value;
+  const age = parseFloat(document.getElementById('age-knee').value);
+  const kh  = parseFloat(document.getElementById('kh').value);
+  const warnEl = document.getElementById('warn-knee');
+  warn(warnEl, "");
+  if(isNaN(age) || isNaN(kh)){
+    setOut('out-knee', NaN); return;
+  }
+  if(age<18 || age>120) warn(warnEl, "⚠️ 年齡超出建議範圍 (18–120)。");
+  if(kh<20 || kh>80)    warn(warnEl, (warnEl.textContent? warnEl.textContent+" " : "") + "⚠️ 膝長常見範圍為 20–80 cm。");
+
+  let ht;
+  if(sex==='M'){ ht = 64.19 - (0.04 * age) + (2.02 * kh); }
+  else{         ht = 84.88 - (0.24 * age) + (1.83 * kh); }
+  setOut('out-knee', ht);
+}
+
+function calcDemi(){
+  const sex = document.getElementById('sex-demi').value;
+  const d   = parseFloat(document.getElementById('demispan').value);
+  const warnEl = document.getElementById('warn-demi');
+  warn(warnEl, "");
+  if(isNaN(d)){ setOut('out-demi', NaN); return; }
+  if(d<30 || d>110) warn(warnEl, "⚠️ 手臂半展長常見範圍為 30–110 cm。");
+  let ht;
+  if(sex==='M'){ ht = (1.40 * d) + 57.8; }
+  else{         ht = (1.35 * d) + 60.1; }
+  setOut('out-demi', ht);
+}
+
+['sex-knee','age-knee','kh'].forEach(id=>document.getElementById(id).addEventListener('input', calcKnee));
+['sex-demi','demispan'].forEach(id=>document.getElementById(id).addEventListener('input', calcDemi));
+
+document.querySelectorAll('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const target = btn.getAttribute('data-target');
+    const text = document.getElementById(target).textContent.replace(' cm','');
+    try{
+      await navigator.clipboard.writeText(text);
+      const old = btn.textContent;
+      btn.textContent = '已複製';
+      setTimeout(()=>btn.textContent = old, 1200);
+    }catch(e){
+      alert('無法自動複製，請手動選取文字。');
+    }
+  });
+});
+
+// Initialize
+calcKnee(); calcDemi();
+</script>
+</body>
+</html>
